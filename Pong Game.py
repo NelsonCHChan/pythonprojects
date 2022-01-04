@@ -29,7 +29,7 @@ paddle_b.goto(350, 0)
 # Ball
 ball = turtle.Turtle()
 ball.speed(0)
-ball.shape("square")
+ball.shape("circle")
 ball.color("white")
 ball.penup()
 ball.goto(0, 0)
@@ -46,6 +46,7 @@ def paddle_a_down():
     y -= 20
     paddle_a.sety(y)
 
+
 def paddle_b_up():
     y = paddle_b.ycor()
     y += 20
@@ -57,41 +58,51 @@ def paddle_b_down():
     y -= 20
     paddle_b.sety(y)
 
+
 # Keyboard binding
 wn.listen()
-wn.onkeypress(paddle_a_up,"w")
-wn.onkeypress(paddle_a_down,"s")
-wn.onkeypress(paddle_b_up,"Up")
-wn.onkeypress(paddle_b_down,"Down")
+wn.onkeypress(paddle_a_up, "w")
+wn.onkeypress(paddle_a_down, "s")
+wn.onkeypress(paddle_b_up, "Up")
+wn.onkeypress(paddle_b_down, "Down")
+
+# Set the ball's initial movement speed and direction.
+dx, dy = 2, 2
 
 # Main game loop
 while True:
     wn.update()
-    
-     # Move the ball
-    ball.setx(ball.xcor() + ball.dx)
-    ball.sety(ball.ycor() + ball.dy)
+
+    # Move the ball
+    ball.setx(ball.xcor() + dx)
+    ball.sety(ball.ycor() + dy)
 
     # Border checking
     if ball.ycor() > 290:
-     ball.sety(290)
-     ball.dy *= -1
+        ball.sety(290)
+        dy *= -1
 
-    if ball.ycor() < -290 :
-     ball.sety(-290)
-     ball.dy *= -1
+    if ball.ycor() < -290:
+        ball.sety(-290)
+        dy *= -1
 
     if ball.xcor() > 390:
-     ball.goto(0, 0)
-     ball.dx *= -1
+        ball.goto(0, 0)
+        dx *= -1
 
     if ball.xcor() < -390:
-     ball.goto(0, 0)
-     ball.dx *= -1
+        ball.goto(0, 0)
+        dx *= -1
 
- # Paddle and ball collisions
-if ball.xcor() > 340 and ball.xcor() <350 and (ball.ycor() < paddle_b.ycor() + 40 and ball.ycor() > paddle_b.ycor() -40) :
- ball.setx(340)
- ball.dx *= -1
+    # Paddle and ball collisions
+    if 340 < ball.xcor() < 350 and (
+        paddle_b.ycor() - 60 < ball.ycor() < paddle_b.ycor() + 60
+    ):
+        ball.setx(340)
+        dx *= -1
 
-    
+    if -350 < ball.xcor() < -340 and (
+        paddle_a.ycor() - 60 < ball.ycor() < paddle_a.ycor() + 60
+    ):
+        ball.setx(-340)
+        dx *= -1
