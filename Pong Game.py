@@ -1,32 +1,51 @@
-# Pong Game
+"""Pong Game."""
+
 import turtle
+
+HEIGHT = 600
+WIDTH = 800
+
+PADDLE_X_POS = int(WIDTH / 2) - 50
+PADDLE_DY = 20
+PADDLE_STRETCH_WID = 5
+PADDLE_STRETCH_LEN = 1
+PADDLE_LEN = PADDLE_STRETCH_WID * 10
+PADDLE_COLOUR = "white"
+PADDLE_SHAPE = "square"
+
+BALL_X_LIM, BALL_Y_LIM = (390, 290)
+BALL_COLOUR = "white"
+BALL_SHAPE = "square"
+
 
 wn = turtle.Screen()
 wn.title("Pong by Nelson Chan")
 wn.bgcolor("black")
-wn.setup(width=800, height=600)
+wn.setup(width=WIDTH, height=HEIGHT)
 wn.tracer(0)
 
-
-# Paddle A
 paddle_a = turtle.Turtle()
 paddle_a.speed(0)
-paddle_a.shape("square")
-paddle_a.color("white")
-paddle_a.shapesize(stretch_wid=5, stretch_len=1)
+paddle_a.shape(PADDLE_SHAPE)
+paddle_a.color(PADDLE_COLOUR)
+paddle_a.shapesize(
+    stretch_wid=PADDLE_STRETCH_WID,
+    stretch_len=PADDLE_STRETCH_LEN,
+)
 paddle_a.penup()
-paddle_a.goto(-350, 0)
+paddle_a.goto(-PADDLE_X_POS, 0)
 
-# Paddle B
 paddle_b = turtle.Turtle()
 paddle_b.speed(0)
-paddle_b.shape("square")
-paddle_b.color("white")
-paddle_b.shapesize(stretch_wid=5, stretch_len=1)
+paddle_b.shape(PADDLE_SHAPE)
+paddle_b.color(PADDLE_COLOUR)
+paddle_b.shapesize(
+    stretch_wid=PADDLE_STRETCH_WID,
+    stretch_len=PADDLE_STRETCH_LEN,
+)
 paddle_b.penup()
-paddle_b.goto(350, 0)
+paddle_b.goto(PADDLE_X_POS, 0)
 
-# Ball
 ball = turtle.Turtle()
 ball.speed(0)
 ball.shape("square")
@@ -34,64 +53,66 @@ ball.color("white")
 ball.penup()
 ball.goto(0, 0)
 
-# Function
+
 def paddle_a_up():
-    y = paddle_a.ycor()
-    y += 20
-    paddle_a.sety(y)
+    new_y = paddle_a.ycor() + PADDLE_DY
+    paddle_a.sety(new_y)
 
 
 def paddle_a_down():
-    y = paddle_a.ycor()
-    y -= 20
-    paddle_a.sety(y)
+    new_y = paddle_a.ycor() - PADDLE_DY
+    paddle_a.sety(new_y)
+
 
 def paddle_b_up():
-    y = paddle_b.ycor()
-    y += 20
-    paddle_b.sety(y)
+    new_y = paddle_b.ycor() + PADDLE_DY
+    paddle_b.sety(new_y)
 
 
 def paddle_b_down():
-    y = paddle_b.ycor()
-    y -= 20
-    paddle_b.sety(y)
+    new_y = paddle_b.ycor() - PADDLE_DY
+    paddle_b.sety(new_y)
 
-# Keyboard binding
+
+# Keyboard binding.
 wn.listen()
-wn.onkeypress(paddle_a_up,"w")
-wn.onkeypress(paddle_a_down,"s")
-wn.onkeypress(paddle_b_up,"Up")
-wn.onkeypress(paddle_b_down,"Down")
+wn.onkeypress(paddle_a_up, "w")
+wn.onkeypress(paddle_a_down, "s")
+wn.onkeypress(paddle_b_up, "Up")
+wn.onkeypress(paddle_b_down, "Down")
 
-# Main game loop
+ball_dx = 2
+ball_dy = 2
+
+# Main game loop.
 while True:
     wn.update()
-    
-     # Move the ball
-    ball.setx(ball.xcor() + ball.dx)
-    ball.sety(ball.ycor() + ball.dy)
 
-    # Border checking
-    if ball.ycor() > 290:
-     ball.sety(290)
-     ball.dy *= -1
+    # Move the ball.
+    ball.setx(ball.xcor() + ball_dx)
+    ball.sety(ball.ycor() + ball_dy)
 
-    if ball.ycor() < -290 :
-     ball.sety(-290)
-     ball.dy *= -1
+    # Paddle A and ball collisions.
+    cond1 = -PADDLE_X_POS < ball.xcor() < -PADDLE_X_POS + 10
+    cond2 = paddle_a.ycor() - PADDLE_LEN < ball.ycor() < paddle_a.ycor() + PADDLE_LEN
 
-    if ball.xcor() > 390:
-     ball.goto(0, 0)
-     ball.dx *= -1
+    # Paddle B and ball collisions.
+    cond3 = PADDLE_X_POS - 10 < ball.xcor() < PADDLE_X_POS
+    cond4 = paddle_b.ycor() - PADDLE_LEN < ball.ycor() < paddle_b.ycor() + PADDLE_LEN
 
-    if ball.xcor() < -390:
-     ball.goto(0, 0)
-     ball.dx *= -1
-
- # Paddle and ball collisions
-if ball.xcor() > 340 and ball.xcor() <350 and (ball.ycor() < paddle_b.ycor() + 40 and ball.ycor() > paddle_b.ycor() -40) :
- ball.setx(340)
- ball.dx *= -1
-
-    
+    # Border checking.
+    if ball.ycor() > BALL_Y_LIM:
+        ball.sety(BALL_Y_LIM)
+        ball_dy *= -1
+    elif ball.ycor() < -BALL_Y_LIM:
+        ball.sety(-BALL_Y_LIM)
+        ball_dy *= -1
+    elif (ball.xcor() > BALL_X_LIM) or (ball.xcor() < -BALL_X_LIM):
+        ball.goto(0, 0)
+        ball_dx *= -1
+    elif cond1 and cond2:
+        ball.setx(-PADDLE_X_POS + 10)
+        ball_dx *= -1
+    elif cond3 and cond4:
+        ball.setx(PADDLE_X_POS - 10)
+        ball_dx *= -1
